@@ -1,5 +1,5 @@
 --ps: debit(borç)=müşterini hesabı/ credit(alacak)=bankanın kasa hesabı--
---transaction ekleeme--
+--transaction ekleme--
 INSERT INTO transactions(account_id, type, amount)
 VALUES (1 , 'deposit', 500);
 
