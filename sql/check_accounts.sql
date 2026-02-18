@@ -10,3 +10,5 @@ INSERT INTO cutomers (name) VALUES ('test user');
 INSERT INTO accounts (customer_id) VALUES (3);
 
 SELECT * FROM accounts WHERE customer_id = 3; 
+
+PRAGMA table_info(ledger);
