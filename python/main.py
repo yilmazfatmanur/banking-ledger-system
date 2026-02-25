@@ -4,7 +4,7 @@ import os
 def main():
     print("--- Banka Sistemi Başlatılıyor ---")
     
-    # Veritabanı dosyasını kontrol ettirdim 
+    # Veritabanı dosyasını kontrol ettirdim (burdan bahsettim mesajda okuduktan sonra bu parantezi sil please)
     db_file = "banka.db"
     if not os.path.exists(db_file):
         print("İlk Çalıştırma: tablolar oluşturuluyor...")
