@@ -1,32 +1,86 @@
-from database import create_tables, add_customer
+from database import create_tables, add_customer, get_customers, create_account, get_accounts, deposit, withdraw
 
 def main():
-    print("--- Banking Ledger System Başlatılıyor ---")
+    print("--- Banka Sistemi Başlatılıyor ---")
     
-    # Tabloları kur (Verileri sıfırlar!)
+    #Tabloları her açılışta sıfırlar. 
+    #Bacım kalıcı tablolar için burayı comment yapmamız lazım (deneme durumları için açık bıraktım)
     create_tables()
     print("DB bağlanıyor + tablolar hazır")
 
     while True:
         print("\n--- ANA MENÜ ---")
         print("1. Müşteri Ekle")
-        print("2. Çıkış")
+        print("2. Hesap Oluştur")
+        print("3. Hesapları Listele")
+        print("4. Para Yatırma (Deposit)")
+        print("5. Para Çekme (Withdraw)")
+        print("6. Çıkış")
         
         secim = input("Seçiminiz: ")
         
         if secim == "1":
             print("\n--- Yeni Müşteri Ekle ---")
-            # İSİM İSTEME
             isim = input("Müşteri Adı Soyadı: ")
-            
-            if isim.strip(): # İsim doluysa
+            if isim.strip():
                 add_customer(isim)
-                # pydan EKLEME MESAJI
-                print("Python’dan müşteri ekleniyor... ")
             else:
                 print("İsim boş olamaz!")
-            
+
+        #get customers (hesap oluşturma)
         elif secim == "2":
+            print("\n--- HESAP OLUŞTURMA ---")
+            musteriler = get_customers()
+            if not musteriler:
+                print("Müşteri yok. Önce 1. menüden müşteri ekleyin.")
+            else:
+                for m in musteriler:
+                    print(f"ID: {m['customer_id']} - İsim: {m['name']}")
+                try:
+                    secilen_id = int(input("\nHesap açılacak Müşteri ID: "))
+                    create_account(secilen_id)
+                except ValueError:
+                    print("HATA: Geçerli bir sayı girin!")
+
+        # get accounts (hesap listesi)
+        elif secim == "3":
+            print("\n--- HESAP LİSTESİ ---")
+            hesaplar = get_accounts()
+            if not hesaplar:
+                print("Sistemde hesap yok.")
+            else:
+                print(f"{'Hesap No':<10} | {'Müşteri Adı':<20} | {'Bakiye':<10}")
+                print("-" * 45)
+                for h in hesaplar:
+                    print(f"{h['hesap_no']:<10} | {h['musteri_adi']:<20} | {h['bakiye']} TL")
+
+        # deposit (para yatırma)
+        elif secim == "4":
+            print("\n--- PARA YATIRMA ---")
+            try:
+                hesap_id = int(input("Para yatırılacak Hesap No: "))
+                tutar = float(input("Yatırılacak Tutar (TL): "))
+                if tutar > 0:
+                    deposit(hesap_id, tutar)
+                else:
+                    print("HATA: Tutar 0'dan büyük olmalıdır.")
+            except ValueError:
+                print("HATA: Lütfen geçerli sayılar girin!")
+
+        #withdraw (para çekme)
+        elif secim == "5":
+            print("\n--- PARA ÇEKME ---")
+            try:
+                hesap_id = int(input("Para çekilecek Hesap No: "))
+                tutar = float(input("Çekilecek Tutar (TL): "))
+                if tutar > 0:
+                    withdraw(hesap_id, tutar)
+                else:
+                    print("HATA: Tutar 0'dan büyük olmalıdır.")
+            except ValueError:
+                print("HATA: Lütfen geçerli sayılar girin!")
+
+        elif secim == "6":
             print("Çıkış yapılıyor...")
             break
         else:
