@@ -1,13 +1,18 @@
 from database import create_tables, add_customer, get_customers, create_account, get_accounts, deposit, withdraw, transfer, insert_test_data
+import os 
 
 def main():
     print("--- Banka Sistemi Başlatılıyor ---")
     
-    #Tabloları her açılışta sıfırlar. 
-    #Bacım kalıcı tablolar için burayı comment yapmamız lazım (deneme durumları için açık bıraktım)
-    create_tables()
-    print("DB bağlanıyor + tablolar hazır")
-
+    # Veritabanı dosyasını kontrol ettirdim 
+    db_file = "banka.db"
+    if not os.path.exists(db_file):
+        print("İlk Çalıştırma: tablolar oluşturuluyor...")
+        create_tables()
+        print("DB bağlanıyor + tablolar hazır")
+    else:
+        print("Mevcut veritabanı yüklendi...")
+    
     while True:
         print("\n--- ANA MENÜ ---")
         print("1. Müşteri Ekle")
@@ -18,6 +23,7 @@ def main():
         print("6. Para Transferi")
         print("7. Test Verileri Ekle")
         print("8. Çıkış")
+
         
         secim = input("Seçiminiz: ")
         
