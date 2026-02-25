@@ -1,4 +1,4 @@
-from database import create_tables, add_customer, get_customers, create_account, get_accounts, deposit, withdraw
+from database import create_tables, add_customer, get_customers, create_account, get_accounts, deposit, withdraw, transfer, insert_test_data
 
 def main():
     print("--- Banka Sistemi Başlatılıyor ---")
@@ -15,7 +15,9 @@ def main():
         print("3. Hesapları Listele")
         print("4. Para Yatırma (Deposit)")
         print("5. Para Çekme (Withdraw)")
-        print("6. Çıkış")
+        print("6. Para Transferi")
+        print("7. Test Verileri Ekle")
+        print("8. Çıkış")
         
         secim = input("Seçiminiz: ")
         
@@ -81,10 +83,27 @@ def main():
                 print("HATA: Lütfen geçerli sayılar girin!")
 
         elif secim == "6":
+            print("\n--- PARA TRANSFERİ---")
+            try:
+                from_account_id = int(input("Transfer yapılacak Hesap No: "))
+                to_account_id = int(input("Transfer edilecek Hesap No: "))
+                tutar = float(input("Transfer Edilecek Tutar (TL): "))
+                if tutar > 0:
+                    transfer(from_account_id, to_account_id, tutar)
+                else:
+                    print("HATA: Tutar 0'dan büyük olmalıdır.")
+            except ValueError:
+                print("HATA: Lütfen geçerli sayılar girin!")
+        
+        elif secim == "7":
+            insert_test_data()
+
+    
+        elif secim == "8":
             print("Çıkış yapılıyor...")
             break
         else:
-            print("Geçersiz seçim.")
+            print("Geçersiz seçim. Lütfen 1-8 arasında bir sayı girin.")
 
 if __name__ == "__main__":
     main()

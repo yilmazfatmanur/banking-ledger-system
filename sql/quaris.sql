@@ -16,4 +16,7 @@ INSERT INTO ledger (transactions_id, debit_account, credit_account, amount)
 VALUES(2, 0, 2, 500);
 
 SELECT * From accounts WHERE account_id = 2; 
+SELECT COUNT (*) FROM transactions WHERE type = 'withdraw';
+SELECT COUNT (*) FROM ledger;
+
 
