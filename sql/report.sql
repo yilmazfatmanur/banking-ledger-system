@@ -17,8 +17,8 @@ SELECT
     t.amount AS tutar,
     a.balance AS bakiye
 FROM transactions t 
-JOIN accounts a ON t.account_ id = a.account_id
-JOIN customer c ON a.customer_id = c.customer_id
+JOIN accounts a ON t.account_id = a.account_id
+JOIN customers c ON a.customer_id = c.customer_id
 ORDER BY t.transactions_id DESC;
 
 --transfer detay rapor--
@@ -31,13 +31,13 @@ FROM ledger l
 JOIN accounts a1 ON l.debit_account = a1.account_id
 JOIN customers c1 ON a1.customer_id = c1.customer_id
 JOIN accounts a2 ON l.credit_account = a2.account_id
-JOIN customer c2 ON a2.customer_id = c2.customer_id
+JOIN customers c2 ON a2.customer_id = c2.customer_id
 WHERE l.debit_account !=0 AND l.credit_account !=0
 ORDER BY l.ledger_id DESC;
 
 --bankagenel rapor--
 --toplam müşteri sayısı--
-SELECT COUNT(*) AS toplam_müşteri FRom customers;
+SELECT COUNT(*) AS toplam_müşteri FROM customers;
 
 -- toplam hesap sayısı--
 SELECT COUNT(*) AS toplam_hesap FROM accounts;

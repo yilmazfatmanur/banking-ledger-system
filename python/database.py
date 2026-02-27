@@ -262,3 +262,59 @@ def transfer(from_account_id, to_account_id, amount):
             print(f"HATA: Para transferi başarısız: {e}")
         finally:
             conn.close()
+
+def get_transaction_history(account_id):
+    """Belirli bir hesabın işlem geçmişini getirir."""
+    conn = get_db_connection()
+    if conn:
+        try:
+            cursor = conn.cursor()
+            query = """
+                SELECT 
+                    t.transactions_id,
+                    t.type AS islem_tipi,
+                    t.amount AS tutar,
+                    a.balance AS guncel_bakiye
+                FROM transactions t 
+                JOIN accounts a ON t.account_id = a.account_id
+                WHERE t.account_id = ?
+                ORDER BY t.transactions_id DESC;
+            """
+            cursor.execute(query, (account_id,))
+            return cursor.fetchall()
+        except sqlite3.Error as e:
+            print(f"HATA: Rapor çekilemedi: {e}")
+        finally:
+            conn.close()
+    return []
+
+def get_bank_summary():
+    """Bankanın genel durum özetini getirir."""
+    conn = get_db_connection()
+    summary = {}
+    if conn:
+        try:
+            cursor = conn.cursor()
+            
+            # müşteri sayısı
+            cursor.execute("SELECT COUNT(*) AS toplam FROM customers")
+            summary['musteri_sayisi'] = cursor.fetchone()['toplam']
+            
+            # hesap sayısı
+            cursor.execute("SELECT COUNT(*) AS toplam FROM accounts")
+            summary['hesap_sayisi'] = cursor.fetchone()['toplam']
+            
+            # toplam bakiye
+            cursor.execute("SELECT SUM(balance) AS toplam FROM accounts")
+            bakiye = cursor.fetchone()['toplam']
+            summary['toplam_bakiye'] = bakiye if bakiye else 0
+            
+            # toplam işlem sayısı
+            cursor.execute("SELECT COUNT(*) AS toplam FROM transactions")
+            summary['islem_sayisi'] = cursor.fetchone()['toplam']
+            
+        except sqlite3.Error as e:
+            print(f"HATA: Banka özeti çekilemedi: {e}")
+        finally:
+            conn.close()
+    return summary
