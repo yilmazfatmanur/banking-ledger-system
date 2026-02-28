@@ -1,3 +1,4 @@
+from anomaly_detector import AnomalyDetector
 from database import create_tables, add_customer, get_customers, create_account, get_accounts, deposit, withdraw, transfer, insert_test_data, DB_PATH, get_transaction_history, get_bank_summary
 import os
 
@@ -12,8 +13,11 @@ def main():
     else:
         print("Mevcut veritabanı yüklendi...")
     
+    # Detector'ı doğru veritabanı yoluyla oluştur
+    detector = AnomalyDetector('../bank.db')
+    
     while True:
-        print("--- ANA MENÜ ---")
+        print("\n--- ANA MENÜ ---")
         print("1. Müşteri Ekle")
         print("2. Hesap Oluştur")
         print("3. Hesapları Listele")
@@ -22,12 +26,12 @@ def main():
         print("6. Para Transferi")
         print("7. Test Verileri Ekle")
         print("8. Raporları Görüntüle")
-        print("9. Çıkış")
-
+        print("9. Akıllı İşlem Tespiti")
+        print("10. Çıkış")
         
         secim = input("Seçiminiz: ")
         
-        #müşteri ekleme
+        # müşteri ekleme
         if secim == "1":
             while True:
                 print("\n--- Yeni Müşteri Ekle ---")
@@ -37,11 +41,11 @@ def main():
                 else:
                     print("İsim boş olamaz!")
 
-                tekrar = input("\nBaşka bir müşteri eklemek ister misiniz? (E/H): ") .strip().upper()
+                tekrar = input("\nBaşka bir müşteri eklemek ister misiniz? (E/H): ").strip().upper()
                 if tekrar != 'E':
                     break
 
-        #get customers (hesap oluşturma)
+        # get customers (hesap oluşturma)
         elif secim == "2":
             while True:
                 print("\n--- Hesap Oluşturma ---")
@@ -57,7 +61,7 @@ def main():
                         create_account(secilen_id)
                     except ValueError:
                         print("HATA: Geçerli bir sayı girin!")
-                tekrar = input("\nBaşka bir hesap oluşturmak ister misiniz? (E/H): ") .strip().upper()
+                tekrar = input("\nBaşka bir hesap oluşturmak ister misiniz? (E/H): ").strip().upper()
                 if tekrar != 'E':
                     break
 
@@ -73,7 +77,7 @@ def main():
                 for h in hesaplar:
                     print(f"{h['hesap_no']:<10} | {h['musteri_adi']:<20} | {h['bakiye']} TL")
 
-            input("\n Ana menüye dönmek için 'Enter' tuşuna basın...")
+            input("\nAna menüye dönmek için 'Enter' tuşuna basın...")
 
         # deposit (para yatırma)
         elif secim == "4":
@@ -89,11 +93,11 @@ def main():
                 except ValueError:
                     print("HATA: Lütfen geçerli sayılar girin!")
 
-                tekrar = input("\nBaşka bir para yatırma işlemi yapmak ister misiniz? (E/H): ") .strip().upper()
+                tekrar = input("\nBaşka bir para yatırma işlemi yapmak ister misiniz? (E/H): ").strip().upper()
                 if tekrar != 'E':
                     break
 
-        #withdraw (para çekme)
+        # withdraw (para çekme)
         elif secim == "5":
             while True:
                 print("\n--- Para Çekme ---")
@@ -107,11 +111,10 @@ def main():
                 except ValueError:
                     print("HATA: Lütfen geçerli sayılar girin!")
                 
-                tekrar = input("\nTekrar para çekme işlemi yapmak ister misiniz? (E/H): ") .strip().upper()
+                tekrar = input("\nTekrar para çekme işlemi yapmak ister misiniz? (E/H): ").strip().upper()
                 if tekrar != 'E':
-                        break
+                    break
 
-            
         # transaction (para transferi)
         elif secim == "6":
             while True:
@@ -127,7 +130,7 @@ def main():
                 except ValueError:
                     print("HATA: Lütfen geçerli sayılar girin!")
                 
-                tekrar = input("\nBaşka para transferi yapmak ister misiniz? (E/H): ") .strip().upper()
+                tekrar = input("\nBaşka para transferi yapmak ister misiniz? (E/H): ").strip().upper()
                 if tekrar != 'E':
                     break
 
@@ -177,13 +180,50 @@ def main():
                 else:
                     print("Geçersiz seçim! Lütfen 1-3 arası bir değer girin.")
     
-        # çıkış
         elif secim == "9":
+            print("\n--- Akıllı İşlem Tespiti ---")
+            try:
+                account_id = int(input("İşlem yapılacak Hesap No: "))
+                tutar = float(input("İşlem Tutarı: "))
+                islem_tipi = input("İşlem Tipi (yatırma/çekme): ").lower()
+
+                if islem_tipi in ['yatırma', 'deposit', 'y']:
+                    islem_tipi = 'deposit'
+                elif islem_tipi in ['çekme', 'withdraw', 'c']:
+                    islem_tipi = 'withdraw'
+                else:
+                    print("HATA: Geçersiz işlem tipi! (yatırma veya çekme yazın)")
+                    continue
+
+                # Detector kontrolü
+                onay, risk, message, warning = detector.check_transaction(account_id, tutar, islem_tipi)
+                
+                print(f"\n{message}")
+                
+                if warning:
+                    print(f"⚠️ {warning}")
+
+                if onay:
+                    if islem_tipi == 'withdraw':
+                        withdraw(account_id, tutar)
+                    else:
+                        deposit(account_id, tutar)
+                    print("✅ İşlem başarıyla gerçekleştirildi!")
+                else:
+                    print("❌ İşlem gerçekleştirilmedi!")
+                    
+            except ValueError:
+                print("HATA: Lütfen geçerli sayılar girin!")
+            except Exception as e:
+                print(f"HATA: {str(e)}")
+
+        # çıkış
+        elif secim == "10":
             print("Banka sisteminden çıkış yapılıyor... İyi günler!")
             break 
             
         else:
-            print("Geçersiz seçim. Lütfen 1-9 arasında bir sayı girin.")
+            print("Geçersiz seçim. Lütfen 1-10 arasında bir sayı girin.")
             input("\nDevam etmek için 'Enter' tuşuna basın...")
 
 if __name__ == "__main__":
