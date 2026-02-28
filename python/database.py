@@ -95,6 +95,7 @@ def get_accounts():
             cursor = conn.cursor()
             query = """
                 SELECT 
+                
                     customers.customer_id,
                     customers.name AS musteri_adi,
                     accounts.account_id AS hesap_no,
