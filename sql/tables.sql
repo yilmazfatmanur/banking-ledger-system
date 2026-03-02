@@ -19,7 +19,8 @@ CREATE TABLE transactions (
     transactions_id INTEGER PRIMARY KEY AUTOINCREMENT,
     account_id INTEGER,
     type TEXT,
-    amount REAL
+    amount REAL,
+    transactions_date DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE ledger(
