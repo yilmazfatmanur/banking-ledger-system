@@ -1,274 +1,346 @@
- 🏦 Banking System Backend
+🏦 Banking System Backend
+📖 About The Project
+A simplified banking backend system built with Python and SQLite that simulates real banking operations such as account management, deposits, withdrawals, transaction tracking, and ledger accounting. This project demonstrates backend development fundamentals, including database design, transaction processing, SQL querying, and AI-powered anomaly detection.
 
-A simplified **banking backend system** built with **Python and SQLite** that simulates real banking operations such as account management, deposits, withdrawals, transaction tracking, and ledger accounting.
+🎯 Learning Objectives
+Master database design and SQL fundamentals
 
-This project demonstrates **backend development fundamentals**, including database design, transaction processing, SQL querying, and anomaly detection.
+Implement transaction processing with rollback support
 
----
+Build AI-powered anomaly detection systems
 
- 🚀 Features
+Practice data integrity testing with SQL
 
-✔ Customer creation  
-✔ Account creation  
-✔ Deposit transactions  
-✔ Withdraw transactions  
-✔ Account balance tracking  
-✔ Transaction history logging  
-✔ Financial ledger system  
-✔ SQL reporting queries  
-✔ Data integrity tests  
-✔ AI anomaly detection for suspicious transactions  
+Understand financial ledger systems
 
----
+Develop CLI-based applications
 
-🏗 System Architecture
-
-The project follows a simple backend architecture where **Python handles the business logic** and **SQL manages data storage and querying**.
-
-User (CLI Interface)
-│
-▼
-Python Application (main.py)
-│
-▼
-Database Layer (database.py)
-│
-▼
-SQLite Database (bank.db)
-
-# 🗄 Database Schema
-The system uses four relational tables:
-
-| Table | Purpose |
-|------|------|
-| customers | stores customer information |
-| accounts | stores account balances |
-| transactions | records all deposit and withdraw operations |
-| ledger | tracks accounting entries for financial traceability |
-
-This schema simulates **basic financial accounting logic used in banking systems.**
-
----
-
- 📂 Project Structure
+🏗️ Project Architecture
+text
 banking-ledger-system/
-│
-├── python/
-│ ├── main.py
-│ ├── database.py
-│ └── anomaly_detector.py
-│
-├── sql/
-│ └── tables.sql
-│
-├── tests/
-│ ├── test_account_existence.sql
-│ ├── test_accounts_customers_join.sql
-│ ├── test_anomaly.py
-│ ├── test_balance_calculation.sql
-│ ├──  test_balance_consistency.sql
-│ ├── test_business_rules.sql
-│ ├── test_create.py
-│ ├── test_data_integrity.sql
-│ ├── test_deposit_balance.sql
-│ ├── test_deposit_ledger.sql
-│ ├── test_deposit_transaction.sql
-│ ├── test_duplicate_transaction.sql
-│ ├── test_edge_case.sql
-│ ├── test_filtering.sql
-│ ├── test_large_transaction.sql
-│ ├── test_ledger_balance_rebuild.sql
-│ ├── test_negative_balance.sql
-│ ├── test_negative_balance.sql
-│ ├── test_profile.py
-│ ├── test_rollback_commit.sql
-│ ├── test_transaction_history.sql
-│ └── test_transaction_ledger_match.sql 
-│
-├── bank.db
-│
-└── README.md
-# ⚙️ Technologies Used
+├── python/                  # Backend application layer
+├── sql/                     # Database schema and queries
+├── tests/                   # Comprehensive SQL test suite
+└── bank.db                  # SQLite database
+🛠️ Tech Stack
+Python 3.13 - Backend application logic
 
-| Technology | Purpose |
-|------|------|
-| Python | Backend application logic |
-| SQLite | Relational database |
-| SQL | Data querying and reporting |
-| Git & GitHub | Version control |
+SQLite - Lightweight relational database
 
-Python Libraries
-```python
+Pandas & NumPy - Statistical analysis
+
+Scikit-learn - AI/ML anomaly detection
+
+Unittest - Python testing framework
+
+SQL - Data querying and reporting
+
+📦 Dependencies
+bash
+pip install pandas numpy scikit-learn
+Built-in libraries:
+
+python
 sqlite3
 os
+datetime
+unittest
+🚀 Getting Started
+Prerequisites
+Python 3.8 or higher
 
-💰 Banking Operations
-Create Customer
-1 → Create customer
-Create Account
-2 → Select customer ID → Create account
-Deposit Money
-4 → Account ID → Amount
-Withdraw Money
-5 → Account ID → Amount
-Each operation automatically updates:
--account balance
--transaction history
--ledger records
+SQLite3
 
-📊 SQL Reporting Examples
-Account Balances
+Git
+
+Installation
+Clone the repository
+
+bash
+git clone https://github.com/yilmazfatmanur/banking-ledger-system.git
+cd banking-ledger-system
+Set up virtual environment (optional)
+
+bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+Install dependencies
+
+bash
+pip install pandas numpy scikit-learn
+Initialize database
+
+bash
+cd python
+python test_create.py
+Run the application
+
+bash
+python main.py
+Run tests
+
+bash
+# Run SQL tests
+cd ../tests
+sqlite3 ../bank.db < test_balance_calculation.sql
+
+# Run Python tests
+cd ../python
+python -m unittest discover tests/
+📚 Key Concepts Covered
+1. Database Design & SQL
+Schema Design:
+
+sql
+CREATE TABLE customers (
+    customer_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL
+);
+
+CREATE TABLE accounts (
+    account_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    customer_id INTEGER,
+    balance REAL DEFAULT 0,
+    FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
+);
+Complex Queries:
+
+sql
+-- Account balances with customer names
 SELECT customers.name, accounts.balance
 FROM accounts
-JOIN customers
-ON customers.customer_id = accounts.customer_id;
+JOIN customers ON customers.customer_id = accounts.customer_id;
 
-Transaction History
-SELECT *
-FROM transactions
-ORDER BY transaction_id DESC;
+-- Transaction history
+SELECT * FROM transactions
+WHERE account_id = 1
+ORDER BY date DESC;
+2. Transaction Processing
+Atomic Operations with Rollback:
 
-Largest Transactions
-SELECT account_id, amount
-FROM transactions
-ORDER BY amount DESC
-LIMIT 5;
--These queries simulate basic financial reporting operations.
-🧪 Testing
-
-The project includes SQL test files to verify the correctness of the system.
-
-Test coverage includes:
-
-✔ balance calculation
-✔ deposit correctness
-✔ withdrawal validation
-✔ ledger integrity
-✔ transaction history accuracy
-✔ relational data integrity
-
-Example test files:
-
-test_balance_calculation.sql
-test_deposit_balance.sql
-test_withdraw.sql
-test_ledger.sql
-test_data_integrity.sql
-🧾 Ledger Accounting
-
+python
+def transfer(from_account, to_account, amount):
+    try:
+        cursor.execute("BEGIN TRANSACTION")
+        cursor.execute("UPDATE accounts SET balance = balance - ? WHERE account_id = ?", 
+                      (amount, from_account))
+        cursor.execute("UPDATE accounts SET balance = balance + ? WHERE account_id = ?", 
+                      (amount, to_account))
+        cursor.execute("COMMIT")
+    except:
+        cursor.execute("ROLLBACK")
+        raise
+3. Ledger Accounting System
 Each financial transaction creates:
 
-a transaction record
+Transaction Record - User-facing operation log
 
-a ledger entry
+Ledger Entry - Internal accounting record
 
-Example accounting logic:
+python
+# Deposit example (Debit account)
+cursor.execute("""
+    INSERT INTO ledger (transactions_id, debit_account, credit_account, amount) 
+    VALUES (?, ?, 0, ?)
+""", (transaction_id, account_id, amount))
 
-Deposit  → Debit account
-Withdraw → Credit account
+# Withdraw example (Credit account)
+cursor.execute("""
+    INSERT INTO ledger (transactions_id, debit_account, credit_account, amount) 
+    VALUES (?, 0, ?, ?)
+""", (transaction_id, account_id, amount))
+4. AI Anomaly Detection
+Statistical Anomaly Detection:
 
-This ensures all financial operations are traceable and auditable.
-
-🧠 AI Anomaly Detection
-
-The project includes a Python-based anomaly detection module designed to detect suspicious transactions.
-The detector flags abnormal behavior such as:
-
--unusually large withdrawals
--sudden spikes in transaction amounts
--transactions far above a user's normal spending pattern
-This simulates basic fraud detection used in real banking systems.
-
-Example Python Logic
-def detect_anomaly(amount, average_transaction):
+python
+def detect_anomaly(amount, avg_transaction, std_transaction):
     """
-    Simple anomaly detection logic for suspicious transactions.
-    If the transaction amount is significantly higher than
-    the user's normal average transaction, flag it as anomaly.
+    Z-score based anomaly detection
+    Z-score > 3 indicates anomaly (0.3% probability)
     """
+    z_score = (amount - avg_transaction) / std_transaction
+    return z_score > 3
+Risk Scoring Algorithm:
 
-    threshold_multiplier = 10
+python
+def calculate_risk_score(amount, user_profile):
+    score = 0
+    if amount > user_profile['avg'] * 3:
+        score += 30
+    if amount > user_profile['max']:
+        score += 20
+    if amount > user_profile['balance'] * 0.5:
+        score += 10
+    return min(score, 100)
+5. Testing Best Practices
+SQL Data Integrity Tests:
 
-    if amount > average_transaction * threshold_multiplier:
-        print("⚠ Anomalous transaction detected")
-        return True
+sql
+-- Test: Balance should never be negative
+INSERT INTO accounts (customer_id, balance) VALUES (1, 100);
+UPDATE accounts SET balance = balance - 200 WHERE account_id = 1;
+SELECT CASE 
+    WHEN balance >= 0 THEN 'PASS' 
+    ELSE 'FAIL' 
+END AS test_result 
+FROM accounts WHERE account_id = 1;
+ROLLBACK;
+Python Unit Tests:
+
+python
+def test_withdraw_insufficient_balance(self):
+    # Arrange
+    account_id = 1
+    initial_balance = 100
     
-    return False
+    # Act
+    result = withdraw(account_id, 200)
+    
+    # Assert
+    self.assertFalse(result)
+    self.assertEqual(get_balance(account_id), initial_balance)
+🧪 Comprehensive Test Suite
+The project includes 20+ SQL test files verifying:
 
-# Example usage
-average_transaction = 800
-new_transaction = 50000
+Test Category	Files
+Balance Tests	test_balance_calculation.sql, test_balance_consistency.sql
+Transaction Tests	test_deposit_transaction.sql, test_withdraw.sql, test_transaction_history.sql
+Ledger Tests	test_deposit_ledger.sql, test_ledger_balance_rebuild.sql, test_transaction_ledger_match.sql
+Integrity Tests	test_data_integrity.sql, test_rollback_commit.sql
+Edge Cases	test_negative_balance.sql, test_large_transaction.sql, test_duplicate_transaction.sql
+Business Rules	test_business_rules.sql, test_account_existence.sql
+Python Tests	test_anomaly.py, test_profile.py, test_create.py
+Run all tests:
 
-if detect_anomaly(new_transaction, average_transaction):
-    print("Transaction flagged for review.")
-Example Detection Output
-Normal user transactions: 500 – 1000 TL
-New transaction: 50,000 TL
+bash
+# SQL tests
+for test in tests/*.sql; do
+    echo "Running $test..."
+    sqlite3 bank.db < $test
+done
 
-⚠ Anomalous transaction detected
-Transaction flagged for review
+# Python tests
+cd python
+python -m unittest discover tests/ -v
+📊 Sample Outputs
+Normal Transaction:
 
-▶️ Running the Project
-Clone the repository:
-git clone https://github.com/yourusername/banking-system.git
+text
+--- Akıllı İşlem Tespiti ---
+Hesap No: 2
+Tutar: 200 TL
+İşlem Tipi: çekme
 
-Navigate to the project folder:
-cd banking-system
+Risk Skoru: 15/100
+✅ NORMAL - Bu işlem normal görünüyor.
+İşlem onayı: ✅
+Suspicious Transaction:
 
-Run the application:
-python src/main.py
+text
+--- Akıllı İşlem Tespiti ---
+Hesap No: 2
+Tutar: 2000 TL
+İşlem Tipi: çekme
 
-The CLI menu will appear:
---- ANA MENÜ ---
-1. Müşteri Ekle
-2. Hesap Oluştur
-3. Hesapları Listele
-4. Para Yatırma
-5. Para Çekme
-6. Para Transferi
-7.Test Verileri Ekle
-8.Raporları Görüntüle
-9.Akıllı İşlem Tespiti
-10.Çıkış 
+Risk Skoru: 75/100
+🔴 KRİTİK RİSK - normal çekme ortalamanızdan 10 katından fazla
+⚠️ Güvenlik nedeniyle işlem reddedildi.
+İşlem onayı: ❌
+🔍 Using SQLite Tools
+Command Line:
+
+bash
+sqlite3 bank.db
+.tables
+SELECT * FROM customers;
+.quit
+GUI Tools:
+
+DB Browser for SQLite
+
+SQLite Studio
+
+VS Code SQLite Extension
 
 📈 Future Improvements
-Possible future improvements:
--REST API with FastAPI
--web interface
--PostgreSQL database migration
--authentication system
--machine learning based fraud detection
--multi-user banking simulation
+✅ REST API with FastAPI
 
- 👩‍💻 Authors & Contributions
+✅ Web interface with React/Vue
 
-**Fatmanur Yılmaz** - [@yilmazfatmanur](https://github.com/yilmazfatmanur)
+✅ PostgreSQL migration
 
-**Responsibilities**
-- Project management and coordination
-- SQL database design  
-- Database schema (customers, accounts, transactions, ledger)  
-- SQL queries and reporting  
-- Data integrity tests  
-- Anomaly detection module implementation  
-- Statistical analysis and risk scoring algorithm
+✅ JWT authentication
 
-**İrem Aybüke Bayburtluoğlu** - [@iraybay](https://github.com/iraybay)
+✅ Real-time fraud detection with ML
 
-**Responsibilities**
-- Python backend development  
-- CLI menu system  
-- Database integration with SQLite  
-- Deposit & withdraw business logic  
-- Application flow control
+✅ Multi-user banking simulation
 
-**🤝 DUO (Ortak Çalışmalar)**
-- System architecture design
-- Error correction and revision
-- Project documentation
-- Testing and quality control
+✅ Transaction notifications
 
-📜 License
-MIT License
+✅ Audit logging system
+
+👩‍💻 Authors & Contributions
+Fatmanur Yılmaz - @yilmazfatmanur
+
+Responsibilities
+
+Project management and coordination
+
+SQL database design and schema
+
+SQL queries and reporting
+
+Data integrity tests (20+ test files)
+
+Anomaly detection module implementation
+
+Statistical analysis and risk scoring algorithm
+
+İrem Aybüke Bayburtluoğlu - @iraybay
+
+Responsibilities
+
+Python backend development
+
+CLI menu system
+
+Database integration with SQLite
+
+Deposit/withdraw/transfer business logic
+
+Application flow control
+
+Error handling and validation
+
+🤝 DUO (Ortak Çalışmalar)
+
+System architecture design
+
+Error correction and revision
+
+Project documentation
+
+Testing and quality control
+
+🤝 Contributing
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+Fork the project
+
+Create your feature branch (git checkout -b feature/AmazingFeature)
+
+Commit your changes (git commit -m 'Add some AmazingFeature')
+
+Push to the branch (git push origin feature/AmazingFeature)
+
+Open a Pull Request
+
+📝 License
+This project is licensed under the MIT License - see the LICENSE file for details.
+
 Copyright (c) 2026 Fatmanur Yılmaz
 
+⭐ Show your support
+Give a ⭐️ if this project helped you learn database design and anomaly detection!
+
+Note: This project is created for educational purposes to demonstrate banking system fundamentals, transaction processing, and AI-powered anomaly detection.
