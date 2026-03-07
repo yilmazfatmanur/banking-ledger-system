@@ -1,5 +1,6 @@
 import sqlite3
 import os
+from decimal import Decimal
 
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 SQL_FILE_PATH = os.path.join(CURRENT_DIR, "..", "sql", "tables.sql")
@@ -113,74 +114,77 @@ def get_accounts():
     return []
 
 def deposit(account_id, amount):
-    """Belirtilen hesaba para yatırır (Deposit). ledger/transaction kaydı atar."""
+    """Para yatırma işlemi."""
     conn = get_db_connection()
     if conn:
         try:
             cursor = conn.cursor()
             
-            # yeni eklenen HESAP kontrolü
+            # Hesap kontrolü
             cursor.execute("SELECT * FROM accounts WHERE account_id = ?", (account_id,))
-            hesap = cursor.fetchone()
+            if not cursor.fetchone():
+                print("HATA: Hesap bulunamadı!")
+                return
+
+            final_amount_float = float(amount) 
+
+            # İşlem Kaydı 
+            cursor.execute("INSERT INTO transactions (account_id, type, amount) VALUES (?, 'deposit', ?)", (account_id, final_amount_float))
+            t_id = cursor.lastrowid
             
-            if not hesap:
-                print("HATA: Böyle bir hesap bulunamadı! Lütfen geçerli bir Hesap No girin.")
-                return 
+            # Bakiye Güncelleme 
+            cursor.execute("UPDATE accounts SET balance = balance + ? WHERE account_id = ?", (final_amount_float, account_id))
             
-            # işlem tablosuna kayıt
-            cursor.execute("INSERT INTO transactions (account_id, type, amount) VALUES (?, 'deposit', ?)", (account_id, amount))
-            transaction_id = cursor.lastrowid
-            
-            # hesap bakiye güncelleme
-            cursor.execute("UPDATE accounts SET balance = balance + ? WHERE account_id = ?", (amount, account_id))
-            
-            # Ledger kaydı
-            cursor.execute("INSERT INTO ledger (transactions_id, debit_account, credit_account, amount) VALUES (?, ?, 0, ?)", (transaction_id, account_id, amount))
+            # Ledger Kaydı
+            cursor.execute("INSERT INTO ledger (transactions_id, debit_account, credit_account, amount) VALUES (?, ?, 0, ?)", (t_id, account_id, final_amount_float))
             
             conn.commit()
-            print(f"Başarılı: {account_id} numaralı hesaba {amount} TL yatırıldı.")
+            print(f"Başarılı: {account_id} nolu hesaba {amount} TL yatırıldı.")
         except sqlite3.Error as e:
             conn.rollback()
-            print(f"HATA: Para yatırma işlemi başarısız: {e}")
+            print(f"İşlem Hatası: {e}")
         finally:
             conn.close()
 
 def withdraw(account_id, amount):
-    """Belirtilen hesaptan para çeker (Withdraw) ve bakiye kontrolü yapar."""
+    """Para çekme işlemi."""
     conn = get_db_connection()
     if conn:
         try:
             cursor = conn.cursor()
             
-            # Veritabanında ID arama
+            # Bakiye Kontrolü (Veritabanından gelen veriyi Decimal yapıp kıyaslama)
             cursor.execute("SELECT balance FROM accounts WHERE account_id = ?", (account_id,))
             hesap = cursor.fetchone()
             
-            # Hesap hiç yoksa diye
-            if hesap is None:
-                print(f"HATA: {account_id} numaralı bir hesap bulunamadı! Lütfen geçerli bir Hesap No girin.")
-                return # İşlemi burada durdur
+            if not hesap:
+                print("HATA: Hesap bulunamadı!")
+                return
             
-            # Hesap var ama içindeki para çekilmek istenenden azsa
-            if hesap['balance'] < amount:
-                print(f"HATA: Yetersiz bakiye! Mevcut bakiye: {hesap['balance']} TL")
-                return 
+            # Veritabanındaki bakiyeyi Decimal'a çevirip kontrol etmece
+            mevcut_bakiye = Decimal(str(hesap['balance']))
+            
+            if mevcut_bakiye < amount:
+                print(f"HATA: Yetersiz bakiye! (Mevcut: {mevcut_bakiye} TL)")
+                return
 
-            # işlem (Transaction) tablosuna kayıt
-            cursor.execute("INSERT INTO transactions (account_id, type, amount) VALUES (?, 'withdraw', ?)", (account_id, amount))
-            transaction_id = cursor.lastrowid
+            final_amount_float = float(amount)
+
+            #İşlem Kaydı
+            cursor.execute("INSERT INTO transactions (account_id, type, amount) VALUES (?, 'withdraw', ?)", (account_id, final_amount_float))
+            t_id = cursor.lastrowid
             
-            # Hesabın bakiyesini düşürme
-            cursor.execute("UPDATE accounts SET balance = balance - ? WHERE account_id = ?", (amount, account_id))
+            # Bakiye Düşme
+            cursor.execute("UPDATE accounts SET balance = balance - ? WHERE account_id = ?", (final_amount_float, account_id))
             
-            # Ledger kaydı atma (F'nin mantığı: debit 0, credit hesap)
-            cursor.execute("INSERT INTO ledger (transactions_id, debit_account, credit_account, amount) VALUES (?, 0, ?, ?)", (transaction_id, account_id, amount))
+            # Ledger Kaydı
+            cursor.execute("INSERT INTO ledger (transactions_id, debit_account, credit_account, amount) VALUES (?, 0, ?, ?)", (t_id, account_id, final_amount_float))
             
             conn.commit()
-            print(f"Başarılı: {account_id} numaralı hesaptan {amount} TL çekildi.")
+            print(f"Başarılı: {account_id} nolu hesaptan {amount} TL çekildi.")
         except sqlite3.Error as e:
-            conn.rollback() # Bir hata çıkarsa işlemleri geri alma
-            print(f"HATA: Para çekme işlemi başarısız: {e}")
+            conn.rollback()
+            print(f"İşlem Hatası: {e}")
         finally:
             conn.close()
 
@@ -210,57 +214,57 @@ def insert_test_data():
     print("\n--- Test verisi ekleniyor...")
     run_sql_file("insert_database.sql")
 
-def transfer(from_account_id, to_account_id, amount):
-    """Hesaplar arasında para transferi yapar."""
+def transfer(gonderen_id, alici_id, miktar):
+    """İki hesap arası para transferi."""
     conn = get_db_connection()
     if conn:
         try:
             cursor = conn.cursor()
             
-            # Gönderen hesap kontrolü
-            cursor.execute("SELECT balance FROM accounts WHERE account_id = ?", (from_account_id,))
-            from_hesap = cursor.fetchone()
-            if not from_hesap:
-                print(f"HATA: Gönderen hesap {from_account_id} bulunamadı! Lütfen geçerli bir Hesap No girin.")
+            # gönderen Bakiye Kontrolü
+            cursor.execute("SELECT balance FROM accounts WHERE account_id = ?", (gonderen_id,))
+            gonderen = cursor.fetchone()
+            
+            # alıcı Hesap Kontrolü
+            cursor.execute("SELECT account_id FROM accounts WHERE account_id = ?", (alici_id,))
+            alici = cursor.fetchone()
+            
+            if not gonderen:
+                print("HATA: Gönderen hesap bulunamadı.")
+                return
+            if not alici:
+                print("HATA: Alıcı hesap bulunamadı.")
                 return
             
-            # Alıcı hesap kontrolü
-            cursor.execute("SELECT balance FROM accounts WHERE account_id = ?", (to_account_id,))
-            to_hesap = cursor.fetchone()
-            if not to_hesap:
-                print(f"HATA: Alıcı hesap {to_account_id} bulunamadı! Lütfen geçerli bir Hesap No girin.")
+            # Decimal ile Bakiye Kontrolü
+            mevcut_bakiye = Decimal(str(gonderen['balance']))
+            if mevcut_bakiye < miktar:
+                print("HATA: Yetersiz bakiye!")
                 return
+
             
-            # Yetersiz bakiye kontrolü
-            if from_hesap['balance'] < amount:
-                print(f"HATA: Yetersiz bakiye! Gönderen hesabın mevcut bakiyesi: {from_hesap['balance']} TL")
-                return
+            final_amount_float = float(miktar)
+
+            # gönderen Hesaptan Çıkış
+            cursor.execute("INSERT INTO transactions (account_id, type, amount) VALUES (?, 'transfer_out', ?)", (gonderen_id, final_amount_float))
             
-            # İşlem tablosuna kayıt (withdraw)
-            cursor.execute("INSERT INTO transactions (account_id, type, amount) VALUES (?, 'withdraw', ?)", (from_account_id, amount))
-            withdraw_transaction_id = cursor.lastrowid
+            # alıcı Hesaba Giriş
+            cursor.execute("INSERT INTO transactions (account_id, type, amount) VALUES (?, 'transfer_in', ?)", (alici_id, final_amount_float))
+            t_id = cursor.lastrowid 
+
+            # update 
+            cursor.execute("UPDATE accounts SET balance = balance - ? WHERE account_id = ?", (final_amount_float, gonderen_id))
+            cursor.execute("UPDATE accounts SET balance = balance + ? WHERE account_id = ?", (final_amount_float, alici_id))
             
-            # İşlem tablosuna kayıt (deposit)
-            cursor.execute("INSERT INTO transactions (account_id, type, amount) VALUES (?, 'deposit', ?)", (to_account_id, amount))
-            deposit_transaction_id = cursor.lastrowid
+            #ledger Kaydı
+            cursor.execute("INSERT INTO ledger (transactions_id, debit_account, credit_account, amount) VALUES (?, ?, ?, ?)", (t_id, alici_id, gonderen_id, final_amount_float))
             
-            # Gönderen hesaptan para çekme
-            cursor.execute("UPDATE accounts SET balance = balance - ? WHERE account_id = ?", (amount, from_account_id))
-            
-            # Alıcı hesaba para yatırma
-            cursor.execute("UPDATE accounts SET balance = balance + ? WHERE account_id = ?", (amount, to_account_id))
-            
-            # Ledger kaydı atma
-            cursor.execute("INSERT INTO ledger (transactions_id, debit_account, credit_account, amount) VALUES (?, ?, ?, ?)", 
-                           (withdraw_transaction_id, 0, from_account_id, amount))
-            cursor.execute("INSERT INTO ledger (transactions_id, debit_account, credit_account, amount) VALUES (?, ?, ?, ?)",
-                           (deposit_transaction_id, to_account_id, 0, amount))
             conn.commit()
-            print(f"Başarılı: {from_account_id} numaralı hesaptan {to_account_id} numaralı hesaba {amount} TL transfer edildi.")
-        
+            print(f"Transfer Başarılı: {gonderen_id} -> {alici_id} ({miktar} TL)")
+            
         except sqlite3.Error as e:
             conn.rollback()
-            print(f"HATA: Para transferi başarısız: {e}")
+            print(f"Transfer Hatası: {e}")
         finally:
             conn.close()
 
@@ -290,32 +294,125 @@ def get_transaction_history(account_id):
     return []
 
 def get_bank_summary():
-    """Bankanın genel durum özetini getirir."""
+    """
+    Bankanın genel durum özetini (Toplam Mevduat, Çekilen, Yatırılan) getirir.
+    GÜNCELLEME: Toplam yatırılan ve çekilen paralar eklendi.
+    """
     conn = get_db_connection()
     summary = {}
     if conn:
         try:
             cursor = conn.cursor()
             
-            # müşteri sayısı
-            cursor.execute("SELECT COUNT(*) AS toplam FROM customers")
-            summary['musteri_sayisi'] = cursor.fetchone()['toplam']
+           
+            cursor.execute("SELECT COUNT(*) as sayi FROM customers")
+            summary['musteri_sayisi'] = cursor.fetchone()['sayi']
             
-            # hesap sayısı
-            cursor.execute("SELECT COUNT(*) AS toplam FROM accounts")
-            summary['hesap_sayisi'] = cursor.fetchone()['toplam']
+            cursor.execute("SELECT COUNT(*) as sayi FROM accounts")
+            summary['hesap_sayisi'] = cursor.fetchone()['sayi']
             
-            # toplam bakiye
-            cursor.execute("SELECT SUM(balance) AS toplam FROM accounts")
-            bakiye = cursor.fetchone()['toplam']
-            summary['toplam_bakiye'] = bakiye if bakiye else 0
+            # Toplam Bakiye
+            cursor.execute("SELECT SUM(balance) as toplam FROM accounts")
+            res = cursor.fetchone()['toplam']
+            summary['toplam_para'] = res if res else 0
+
+            # Toplam Yatırılan (Deposit)
+            cursor.execute("SELECT SUM(amount) as toplam FROM transactions WHERE type='deposit'")
+            res_dep = cursor.fetchone()['toplam']
+            summary['toplam_yatirilan'] = res_dep if res_dep else 0
+
+            # Toplam Çekilen (Withdraw)
+            cursor.execute("SELECT SUM(amount) as toplam FROM transactions WHERE type='withdraw'")
+            res_with = cursor.fetchone()['toplam']
+            summary['toplam_cekilen'] = res_with if res_with else 0
             
-            # toplam işlem sayısı
-            cursor.execute("SELECT COUNT(*) AS toplam FROM transactions")
-            summary['islem_sayisi'] = cursor.fetchone()['toplam']
-            
+            return summary
         except sqlite3.Error as e:
-            print(f"HATA: Banka özeti çekilemedi: {e}")
+            print(f"Özet hatası: {e}")
         finally:
             conn.close()
-    return summary
+    return {}
+
+def get_active_stats():
+    """
+    En aktif müşteri ve en çok para gönderen hesabı bulur.
+    """
+    conn = get_db_connection()
+    stats = {}
+    if conn:
+        try:
+            cursor = conn.cursor()
+            
+            # En Aktif Müşteri 
+            query_active = """
+                SELECT c.name, COUNT(t.transactions_id) as islem_sayisi
+                FROM transactions t
+                JOIN accounts a ON t.account_id = a.account_id
+                JOIN customers c ON a.customer_id = c.customer_id
+                GROUP BY c.customer_id
+                ORDER BY islem_sayisi DESC
+                LIMIT 1
+            """
+            cursor.execute(query_active)
+            active_user = cursor.fetchone()
+            stats['en_aktif_musteri'] = active_user if active_user else None
+
+            # En Çok Para Gönderen Hesap 
+            query_sender = """
+                SELECT c.name, SUM(t.amount) as toplam_gonderilen
+                FROM transactions t
+                JOIN accounts a ON t.account_id = a.account_id
+                JOIN customers c ON a.customer_id = c.customer_id
+                WHERE t.type = 'transfer_out'
+                GROUP BY c.customer_id
+                ORDER BY toplam_gonderilen DESC
+                LIMIT 1
+            """
+            cursor.execute(query_sender)
+            top_sender = cursor.fetchone()
+            stats['en_cok_gonderen'] = top_sender if top_sender else None
+            
+            return stats
+        finally:
+            conn.close()
+    return {}
+
+def get_last_global_transactions(limit=10):
+    """Sistemdeki son işlemleri getirir."""
+    conn = get_db_connection()
+    if conn:
+        try:
+            cursor = conn.cursor()
+            query = """
+                SELECT t.transactions_id, c.name, t.type, t.amount, t.transactions_date
+                FROM transactions t
+                JOIN accounts a ON t.account_id = a.account_id
+                JOIN customers c ON a.customer_id = c.customer_id
+                ORDER BY t.transactions_id DESC
+                LIMIT ?
+            """
+            cursor.execute(query, (limit,))
+            return cursor.fetchall()
+        finally:
+            conn.close()
+    return []
+
+def get_large_transactions(limit_amount=5000):
+    """Belli bir tutarın üzerindeki işlemleri raporlar."""
+    conn = get_db_connection()
+    if conn:
+        try:
+            cursor = conn.cursor()
+            query = """
+                SELECT c.name, t.type, t.amount
+                FROM transactions t
+                JOIN accounts a ON t.account_id = a.account_id
+                JOIN customers c ON a.customer_id = c.customer_id
+                WHERE t.amount >= ?
+                ORDER BY t.amount DESC
+            """
+            cursor.execute(query, (limit_amount,))
+            return cursor.fetchall()
+        finally:
+            conn.close()
+    return []
