@@ -1,4 +1,4 @@
-# 🏦 Banking System Backend
+ 🏦 Banking System Backend
 
 A simplified **banking backend system** built with **Python and SQLite** that simulates real banking operations such as account management, deposits, withdrawals, transaction tracking, and ledger accounting.
 
@@ -6,7 +6,7 @@ This project demonstrates **backend development fundamentals**, including databa
 
 ---
 
-# 🚀 Features
+ 🚀 Features
 
 ✔ Customer creation  
 ✔ Account creation  
@@ -21,7 +21,7 @@ This project demonstrates **backend development fundamentals**, including databa
 
 ---
 
-# 🏗 System Architecture
+🏗 System Architecture
 
 The project follows a simple backend architecture where **Python handles the business logic** and **SQL manages data storage and querying**.
 
@@ -50,7 +50,7 @@ This schema simulates **basic financial accounting logic used in banking systems
 
 ---
 
-# 📂 Project Structure
+ 📂 Project Structure
 banking-ledger-system/
 │
 ├── python/
@@ -97,8 +97,7 @@ banking-ledger-system/
 | SQL | Data querying and reporting |
 | Git & GitHub | Version control |
 
-### Python Libraries
-
+Python Libraries
 ```python
 sqlite3
 os
@@ -208,10 +207,9 @@ New transaction: 50,000 TL
 
 ⚠ Anomalous transaction detected
 Transaction flagged for review
+
 ▶️ Running the Project
-
 Clone the repository:
-
 git clone https://github.com/yourusername/banking-system.git
 
 Navigate to the project folder:
@@ -242,7 +240,7 @@ Possible future improvements:
 -machine learning based fraud detection
 -multi-user banking simulation
 
-## 👩‍💻 Authors & Contributions
+ 👩‍💻 Authors & Contributions
 
 **Fatmanur Yılmaz** - [@yilmazfatmanur](https://github.com/yilmazfatmanur)
 
