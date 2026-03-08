@@ -345,8 +345,7 @@ Possible future improvements:
 - Application flow control
 
 <<<<<<< HEAD
-**🤝 DUO (Ortak Çalışmalar)**
-=======
+
 **🤝 DUO (Collaborative Works)**
 >>>>>>> c1fe2e469bb4ecaa113b3bd3d7dce1cb44331ea3
 - System architecture design
