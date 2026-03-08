@@ -344,7 +344,11 @@ Possible future improvements:
 - Deposit & withdraw business logic
 - Application flow control
 
+<<<<<<< HEAD
 **🤝 DUO (Ortak Çalışmalar)**
+=======
+**🤝 DUO (Collaborative Works)**
+>>>>>>> c1fe2e469bb4ecaa113b3bd3d7dce1cb44331ea3
 - System architecture design
 - Error correction and revision
 - Project documentation
@@ -375,6 +379,12 @@ If this project helped you learn **database design**, **transaction processing**
 
 ---
 
+<<<<<<< HEAD
 *Made by [Fatmanur Yılmaz](https://github.com/yilmazfatmanur) & [İrem Aybüke Bayburtluoğlu](https://github.com/iraybay)*
 
 </div>
+=======
+*Made  by [Fatmanur Yılmaz](https://github.com/yilmazfatmanur) & [İrem Aybüke Bayburtluoğlu](https://github.com/iraybay)*
+
+</div>
+>>>>>>> c1fe2e469bb4ecaa113b3bd3d7dce1cb44331ea3
