@@ -373,7 +373,7 @@ If this project helped you learn **database design**, **transaction processing**
 
 *Built with curiosity and lots of SQL queries ☕*
 
-> 📌 **Note:** This project is created for **educational purposes** to demonstrate banking system fundamentals, transaction processing, and AI-powered anomaly detection.
+> 📌 **Ps:** This project is created for **educational purposes** to demonstrate banking system fundamentals, transaction processing, and AI-powered anomaly detection.
 
 ---
 
