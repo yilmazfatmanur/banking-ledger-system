@@ -377,12 +377,6 @@ If this project helped you learn **database design**, **transaction processing**
 
 ---
 
-<<<<<<< HEAD
 *Made by [Fatmanur Yılmaz](https://github.com/yilmazfatmanur) & [İrem Aybüke Bayburtluoğlu](https://github.com/iraybay)*
 
-</div>
-=======
-*Made  by [Fatmanur Yılmaz](https://github.com/yilmazfatmanur) & [İrem Aybüke Bayburtluoğlu](https://github.com/iraybay)*
-
-</div>
 
