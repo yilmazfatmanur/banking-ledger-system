@@ -63,13 +63,6 @@ The system uses four relational tables:
 
 This schema simulates **basic financial accounting logic used in banking systems.**
 
-### 📊 Entity Relationship Diagram
-
-<div align="center">
-  <img src="images/er_diagram.png" alt="Banking System ER Diagram" width="100%"/>
-</div>
-
----
 
 ## 📂 Project Structure
 
