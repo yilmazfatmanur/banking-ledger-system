@@ -344,10 +344,9 @@ Possible future improvements:
 - Deposit & withdraw business logic
 - Application flow control
 
-<<<<<<< HEAD
+
 
 **🤝 DUO (Collaborative Works)**
->>>>>>> c1fe2e469bb4ecaa113b3bd3d7dce1cb44331ea3
 - System architecture design
 - Error correction and revision
 - Project documentation
