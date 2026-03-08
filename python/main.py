@@ -9,15 +9,18 @@ from decimal import Decimal
 
 def main():
     print("--- Banka Sistemi Başlatılıyor ---")
-
-    if not os.path.exists(DB_PATH):
-            print(" Veritabanı ve tablolar oluşturuluyor...")
-            create_tables()
-            print("Veritabanı hazır.")
+    
+    db_path = os.path.join(os.path.dirname(__file__), "..", "bank.db")  
+    
+    if not os.path.exists(db_path):
+        print("İlk çalıştırma - Tablolar oluşturuluyor...")
+        create_tables()
     else:
-            print(" Veritabanı yüklendi: {DB_PATH}")
-        
-    detector = AnomalyDetector(DB_PATH)
+        print("Veritabanı mevcut - Bağlanıyor...")
+    
+    print("DB bağlanıyor + tablolar hazır")
+    
+    detector = AnomalyDetector(DB_PATH) 
         
     while True:
         print("\n--- ANA MENÜ ---")
