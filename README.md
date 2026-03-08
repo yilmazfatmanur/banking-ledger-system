@@ -344,7 +344,7 @@ Possible future improvements:
 - Deposit & withdraw business logic
 - Application flow control
 
-**🤝 DUO (Ortak Çalışmalar)**
+**🤝 DUO (Collaborative Works)**
 - System architecture design
 - Error correction and revision
 - Project documentation
