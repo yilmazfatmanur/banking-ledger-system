@@ -75,7 +75,14 @@ banking-ledger-system/
 │   └── anomaly_detector.py
 │
 ├── sql/
-│   └── tables.sql
+│   ├──tables.sql
+│   ├──check_accounts.sql
+│   ├─insert_database.sql
+│   ├──report.sql
+│   ├─list_accounts.sql
+│   ├─transactions.sql
+│   ├─transfer.sql
+│   └── quaris.sql
 │
 ├── tests/
 │   ├── test_account_existence.sql
