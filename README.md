@@ -1,0 +1,380 @@
+# 🏦 Banking System Backend
+
+<div align="center">
+
+![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![SQLite](https://img.shields.io/badge/SQLite-07405E?style=for-the-badge&logo=sqlite&logoColor=white)
+![SQL](https://img.shields.io/badge/SQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
+![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)
+![MIT License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
+
+</div>
+
+A simplified **banking backend system** built with **Python and SQLite** that simulates real banking operations such as account management, deposits, withdrawals, transaction tracking, and ledger accounting.
+
+This project demonstrates **backend development fundamentals**, including database design, transaction processing, SQL querying, and anomaly detection.
+
+---
+
+## 🚀 Features
+
+✔ Customer creation  
+✔ Account creation  
+✔ Deposit transactions  
+✔ Withdraw transactions  
+✔ Account balance tracking  
+✔ Transaction history logging  
+✔ Financial ledger system  
+✔ SQL reporting queries  
+✔ Data integrity tests  
+✔ AI anomaly detection for suspicious transactions  
+
+---
+
+## 🏗 System Architecture
+
+The project follows a simple backend architecture where **Python handles the business logic** and **SQL manages data storage and querying**.
+
+```
+User (CLI Interface)
+│
+▼
+Python Application (main.py)
+│
+▼
+Database Layer (database.py)
+│
+▼
+SQLite Database (bank.db)
+```
+
+---
+
+## 🗄 Database Schema
+
+The system uses four relational tables:
+
+| Table | Purpose |
+|:------|:--------|
+| customers | Stores customer information |
+| accounts | Stores account balances |
+| transactions | Records all deposit and withdraw operations |
+| ledger | Tracks accounting entries for financial traceability |
+
+This schema simulates **basic financial accounting logic used in banking systems.**
+
+### 📊 Entity Relationship Diagram
+
+<div align="center">
+  <img src="images/er_diagram.png" alt="Banking System ER Diagram" width="100%"/>
+</div>
+
+---
+
+## 📂 Project Structure
+
+```
+banking-ledger-system/
+│
+├── python/
+│   ├── main.py
+│   ├── database.py
+│   └── anomaly_detector.py
+│
+├── sql/
+│   └── tables.sql
+│
+├── tests/
+│   ├── test_account_existence.sql
+│   ├── test_accounts_customers_join.sql
+│   ├── test_anomaly.py
+│   ├── test_balance_calculation.sql
+│   ├── test_balance_consistency.sql
+│   ├── test_business_rules.sql
+│   ├── test_create.py
+│   ├── test_data_integrity.sql
+│   ├── test_deposit_balance.sql
+│   ├── test_deposit_ledger.sql
+│   ├── test_deposit_transaction.sql
+│   ├── test_duplicate_transaction.sql
+│   ├── test_edge_case.sql
+│   ├── test_filtering.sql
+│   ├── test_large_transaction.sql
+│   ├── test_ledger_balance_rebuild.sql
+│   ├── test_negative_balance.sql
+│   ├── test_profile.py
+│   ├── test_rollback_commit.sql
+│   ├── test_transaction_history.sql
+│   └── test_transaction_ledger_match.sql
+│
+├── bank.db
+└── README.md
+```
+
+---
+
+## ⚙️ Technologies Used
+
+| Technology | Purpose |
+|:-----------|:--------|
+| Python | Backend application logic |
+| SQLite | Relational database |
+| SQL | Data querying and reporting |
+| Git & GitHub | Version control |
+
+### Python Libraries
+
+```python
+import sqlite3
+import os
+```
+
+---
+
+## 💰 Banking Operations
+
+### Create Customer
+```
+1 → Create customer
+```
+
+### Create Account
+```
+2 → Select customer ID → Create account
+```
+
+### Deposit Money
+```
+4 → Account ID → Amount
+```
+
+### Withdraw Money
+```
+5 → Account ID → Amount
+```
+
+Each operation automatically updates:
+- account balance
+- transaction history
+- ledger records
+
+---
+
+## 📊 SQL Reporting Examples
+
+### Account Balances
+```sql
+SELECT customers.name, accounts.balance
+FROM accounts
+JOIN customers
+ON customers.customer_id = accounts.customer_id;
+```
+
+### Transaction History
+```sql
+SELECT *
+FROM transactions
+ORDER BY transaction_id DESC;
+```
+
+### Largest Transactions
+```sql
+SELECT account_id, amount
+FROM transactions
+ORDER BY amount DESC
+LIMIT 5;
+```
+
+These queries simulate basic financial reporting operations.
+
+---
+
+## 🧪 Testing
+
+The project includes SQL test files to verify the correctness of the system.
+
+Test coverage includes:
+
+✔ balance calculation  
+✔ deposit correctness  
+✔ withdrawal validation  
+✔ ledger integrity  
+✔ transaction history accuracy  
+✔ relational data integrity  
+
+Example test files:
+
+- test_balance_calculation.sql
+- test_deposit_balance.sql
+- test_withdraw.sql
+- test_ledger.sql
+- test_data_integrity.sql
+
+---
+
+## 🧾 Ledger Accounting
+
+Each financial transaction creates:
+
+- a transaction record
+- a ledger entry
+
+```
+Deposit  → Debit account
+Withdraw → Credit account
+```
+
+This ensures all financial operations are traceable and auditable.
+
+---
+
+## 🧠 AI Anomaly Detection
+
+The project includes a Python-based anomaly detection module designed to detect suspicious transactions. The detector flags abnormal behavior such as:
+
+- unusually large withdrawals
+- sudden spikes in transaction amounts
+- transactions far above a user's normal spending pattern
+
+This simulates basic fraud detection used in real banking systems.
+
+### Example Python Logic
+
+```python
+def detect_anomaly(amount, average_transaction):
+    """
+    Simple anomaly detection logic for suspicious transactions.
+    If the transaction amount is significantly higher than
+    the user's normal average transaction, flag it as anomaly.
+    """
+    threshold_multiplier = 10
+
+    if amount > average_transaction * threshold_multiplier:
+        print("⚠ Anomalous transaction detected")
+        return True
+    
+    return False
+
+# Example usage
+average_transaction = 800
+new_transaction = 50000
+
+if detect_anomaly(new_transaction, average_transaction):
+    print("Transaction flagged for review.")
+```
+
+### Example Detection Output
+
+```
+Normal user transactions: 500 – 1000 TL
+New transaction: 50,000 TL
+
+⚠ Anomalous transaction detected
+Transaction flagged for review
+```
+
+---
+
+## ▶️ Running the Project
+
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/banking-system.git
+```
+
+2. Navigate to the project folder:
+```bash
+cd banking-system
+```
+
+3. Run the application:
+```bash
+python src/main.py
+```
+
+4. The CLI menu will appear:
+```
+--- ANA MENÜ ---
+1. Müşteri Ekle
+2. Hesap Oluştur
+3. Hesapları Listele
+4. Para Yatırma
+5. Para Çekme
+6. Para Transferi
+7. Test Verileri Ekle
+8. Raporları Görüntüle
+9. Akıllı İşlem Tespiti
+10. Çıkış
+```
+
+---
+
+## 📈 Future Improvements
+
+Possible future improvements:
+
+- REST API with FastAPI
+- Web interface
+- PostgreSQL database migration
+- Authentication system
+- Machine learning based fraud detection
+- Multi-user banking simulation
+
+---
+
+## 👩‍💻 Authors & Contributions
+
+**Fatmanur Yılmaz** - [@yilmazfatmanur](https://github.com/yilmazfatmanur)
+
+**Responsibilities**
+- Project management and coordination
+- SQL database design
+- Database schema (customers, accounts, transactions, ledger)
+- SQL queries and reporting
+- Data integrity tests
+- Anomaly detection module implementation
+- Statistical analysis and risk scoring algorithm
+
+**İrem Aybüke Bayburtluoğlu** - [@iraybay](https://github.com/iraybay)
+
+**Responsibilities**
+- Python backend development
+- CLI menu system
+- Database integration with SQLite
+- Deposit & withdraw business logic
+- Application flow control
+
+**🤝 DUO (Ortak Çalışmalar)**
+- System architecture design
+- Error correction and revision
+- Project documentation
+- Testing and quality control
+
+---
+
+## 📜 License
+
+```
+MIT License
+Copyright (c) 2026 Fatmanur Yılmaz
+```
+
+---
+
+## ⭐ Show Your Support
+
+<div align="center">
+
+If this project helped you learn **database design**, **transaction processing**, or **anomaly detection** — give it a star!
+
+**⭐️ Star this repo ⭐️**
+
+*Built with curiosity and lots of SQL queries ☕*
+
+> 📌 **Note:** This project is created for **educational purposes** to demonstrate banking system fundamentals, transaction processing, and AI-powered anomaly detection.
+
+---
+
+*Made  by [Fatmanur Yılmaz](https://github.com/yilmazfatmanur) & [İrem Aybüke Bayburtluoğlu](https://github.com/iraybay)*
+
+</div>
